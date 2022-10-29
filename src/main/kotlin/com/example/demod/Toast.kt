@@ -4,7 +4,10 @@ import javafx.animation.FadeTransition
 import javafx.animation.TranslateTransition
 import javafx.application.Application
 import javafx.application.Platform
+import javafx.event.ActionEvent
+import javafx.event.Event
 import javafx.event.EventHandler
+import javafx.event.EventType
 import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.Button
@@ -29,6 +32,11 @@ enum class ImageStyle {
     CIRCLE, RECTANGLE
 }
 
+enum class Position {
+    LEFT_TOP, LEFT_BOTTOM, RIGHT_TOP, RIGHT_BOTTOM
+}
+
+
 class Config {
     var alpha = 0.9
     var openTime = 7000.0
@@ -40,7 +48,7 @@ class Config {
     var height = 200.0
     var minWidth = 300.0
     var minHeigth = 200.0
-    var pos = ""
+    var pos = Position.LEFT_TOP
     var x = 0.0
     var y = 0.0
     var image = ""
@@ -50,8 +58,15 @@ class Config {
     var flag = 1
     val btn1 = Button()
     val btn2 = Button()
-
     val sound = AudioClip(javaClass.getResource("/res/wilhelm_scream.mp3").toExternalForm())
+
+    fun eventBtn1(){
+        println("You've clicked button1!")
+    }
+
+    fun eventBtn2(){
+        println("You've clicked button2!")
+    }
 }
 
 class Toast {
@@ -86,8 +101,8 @@ class Toast {
             return this
         }
 
-        fun setImage(type: String = "Rectangle", src: String = "https://img.freepik.com/premium-photo/beautiful-purple-lilac-flowers_106630-22.jpg"): Builder {
-            config.imageType = if(type == "Rectangle"){
+        fun setImage(type: ImageStyle = ImageStyle.RECTANGLE, src: String = "https://img.freepik.com/premium-photo/beautiful-purple-lilac-flowers_106630-22.jpg"): Builder {
+            config.imageType = if(type == ImageStyle.RECTANGLE){
                 ImageStyle.RECTANGLE
             } else {
                 ImageStyle.CIRCLE
@@ -101,13 +116,13 @@ class Toast {
             return this
         }
 
-        fun setPosAnim(pos: String): Builder {
+        fun setPosAnim(pos: Position): Builder {
             config.pos = pos
             when(pos) {
-                "rightTop" -> setPlace(1100.0, 20.0)
-                "rightBottom" -> setPlace(1100.0, 620.0)
-                "leftBottom" -> setPlace(20.0, 620.0)
-                "leftTop" -> setPlace(20.0, 20.0)
+                Position.RIGHT_TOP -> setPlace(1100.0, 20.0)
+                Position.RIGHT_BOTTOM -> setPlace(1100.0, 620.0)
+                Position.LEFT_BOTTOM -> setPlace(20.0, 620.0)
+                Position.LEFT_TOP -> setPlace(20.0, 20.0)
             }
             return this
         }
@@ -137,7 +152,6 @@ class Toast {
         }
     }
 
-
     private fun build() {
         windows.initStyle(StageStyle.TRANSPARENT)
         root.minWidth = config.minWidth
@@ -166,6 +180,10 @@ class Toast {
         appName.maxWidth = config.width/2
         appName.setAlignment(Pos.TOP_RIGHT)
         title.setAlignment(Pos.CENTER)
+
+        config.btn1.onAction = EventHandler<ActionEvent> { config.eventBtn1() }
+
+        config.btn2.onAction = EventHandler<ActionEvent> { config.eventBtn2()  }
 
 
         if(config.flag == 1) {
@@ -286,7 +304,7 @@ class Toast {
         windows.show()
 
         windows.x = config.x
-        windows.y = if(config.pos == "rightBottom" || config.pos == "leftBottom") {
+        windows.y = if(config.pos == Position.RIGHT_BOTTOM || config.pos == Position.LEFT_BOTTOM) {
             config.y - windows.height + config.minHeigth - 10.0
         } else {
             config.y
@@ -326,8 +344,8 @@ class SomeClass: Application() {
             .setBtnName()
             .setBtn(2)
             .setSize(400.0)
-            .setPosAnim("leftBottom")
-            .setImage("Fade")
+            .setPosAnim(Position.LEFT_BOTTOM)
+            .setImage(ImageStyle.CIRCLE)
             .setAnim("Fad")
             .build()
         toast.start()
