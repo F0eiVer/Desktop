@@ -5,9 +5,7 @@ import javafx.animation.TranslateTransition
 import javafx.application.Application
 import javafx.application.Platform
 import javafx.event.ActionEvent
-import javafx.event.Event
 import javafx.event.EventHandler
-import javafx.event.EventType
 import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.Button
@@ -32,13 +30,17 @@ enum class ImageStyle {
     CIRCLE, RECTANGLE
 }
 
+enum class AnimType{
+    FADE, TRANS
+}
+
 enum class Position {
     LEFT_TOP, LEFT_BOTTOM, RIGHT_TOP, RIGHT_BOTTOM
 }
 
 
 class Config {
-    var alpha = 0.9
+    var alpha = 1.0
     var openTime = 7000.0
     var imageType = ImageStyle.RECTANGLE
     var title = "TITLE"
@@ -52,7 +54,7 @@ class Config {
     var x = 0.0
     var y = 0.0
     var image = ""
-    var animation = ""
+    var animation = AnimType.FADE
     var startX = width
     var finishX = 0.0
     var flag = 1
@@ -111,7 +113,7 @@ class Toast {
             return this
         }
 
-        fun setAnim(type: String = ""): Builder {
+        fun setAnim(type: AnimType = AnimType.FADE): Builder {
             config.animation = type
             return this
         }
@@ -311,9 +313,9 @@ class Toast {
         }
 
         makeSound()
-        if(config.animation == "Fade") {
+        if(config.animation == AnimType.FADE) {
             openFadeAnimation()
-        } else {
+        } else if (config.animation == AnimType.TRANS) {
             openTransAnimation()
         }
         val thread = Thread {
@@ -322,9 +324,9 @@ class Toast {
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
-            if(config.animation == "Fade") {
+            if(config.animation == AnimType.FADE) {
                 closeFadeAnimation()
-            } else {
+            } else if (config.animation == AnimType.TRANS) {
                 closeTransAnimation()
             }
         }
@@ -346,7 +348,7 @@ class SomeClass: Application() {
             .setSize(400.0)
             .setPosAnim(Position.LEFT_BOTTOM)
             .setImage(ImageStyle.CIRCLE)
-            .setAnim("Fad")
+            .setAnim()
             .build()
         toast.start()
 
